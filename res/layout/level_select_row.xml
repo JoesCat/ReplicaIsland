@@ -24,7 +24,7 @@
 	    android:gravity = "top"
 	    android:layout_x="20dp" 
         android:layout_y="5dp" 
-       	android:text="Level 1-1"
+        android:text="@string/level_1_1"
 	              />
 	              
 	<TextView android:id="@+id/time" xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,7 +35,7 @@
 	    android:gravity = "top"
 	    android:layout_x="290dp" 
         android:layout_y="25dp" 
-       	android:text="+ 0:02:031"
+        android:text="@string/s0_02_031"
 	              />
 	              
 </AbsoluteLayout>

@@ -14,7 +14,7 @@
 			    <TextView android:id="@+id/speakername"
 					    android:layout_width="wrap_content" 
 					    android:layout_height="20dp"
-					    android:text="Wanda"
+					    android:text="@string/cd_Wanda"
 					    android:textSize = "15sp"
 					    android:textStyle = "bold"/>
 		   	 	</TableRow>
@@ -25,7 +25,7 @@
 					    android:layout_width="300dp" 
 					    android:layout_height="110dp"
 					    
-					    android:text="Blah blah blah blah blah"
+					    android:text="@string/cd_blah"
 					    android:textSize = "15sp"/>
 				</TableRow>
 			</TableLayout>	

@@ -479,6 +479,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * Must not be called before a renderer has been set.
      */
     public void onPause() {
+        mWatchDog.stop();
         mGLThread.onPause();
     }
 
@@ -490,6 +491,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * Must not be called before a renderer has been set.
      */
     public void onResume() {
+        mWatchDog.start();
         mGLThread.onResume();
     }
     
@@ -1281,11 +1283,9 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	                    // Thus, in "safe mode," I force two swaps to occur before 
 	                    // issuing any GL commands.  Don't ask me how long it took
 	                    // to figure this out.
-	                    if (framesSinceResetHack > 1 || !mSafeMode) {
-	                    	mRenderer.onDrawFrame(gl);
-	                    } else {
-	                    	DebugLog.w("GLThread", "Safe Mode Wait...");
-	                    }
+                        // CTS: do not use safe mode.
+                        mWatchDog.reset();
+                        mRenderer.onDrawFrame(gl);
 	                    
 	                    framesSinceResetHack++;
 
@@ -1661,6 +1661,6 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private GLWrapper mGLWrapper;
     private int mDebugFlags;
     private int mEGLContextClientVersion;
-
+    private final RenderingWatchDog mWatchDog = new RenderingWatchDog();
 	
 }

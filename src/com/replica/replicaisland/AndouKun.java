@@ -142,18 +142,17 @@ public class AndouKun extends Activity implements SensorEventListener {
         
         mPrefsEditor = prefs.edit();
         // Make sure that old game information is cleared when we start a new game.
-        if (getIntent().getBooleanExtra("newGame", false)) {
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_ROW);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_INDEX);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_COMPLETED);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LINEAR_MODE);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_TOTAL_GAME_TIME);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_PEARLS_COLLECTED);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_PEARLS_TOTAL);
-        	mPrefsEditor.remove(PreferenceConstants.PREFERENCE_ROBOTS_DESTROYED);
-			mPrefsEditor.remove(PreferenceConstants.PREFERENCE_DIFFICULTY);
-			mPrefsEditor.commit();
-        }
+        // CTS: clear settings to force start from beginning
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_ROW);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_INDEX);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LEVEL_COMPLETED);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_LINEAR_MODE);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_TOTAL_GAME_TIME);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_PEARLS_COLLECTED);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_PEARLS_TOTAL);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_ROBOTS_DESTROYED);
+        mPrefsEditor.remove(PreferenceConstants.PREFERENCE_DIFFICULTY);
+        mPrefsEditor.commit();
         
         
         mLevelRow = prefs.getInt(PreferenceConstants.PREFERENCE_LEVEL_ROW, 0);

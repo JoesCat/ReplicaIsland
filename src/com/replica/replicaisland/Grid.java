@@ -26,6 +26,8 @@ import java.nio.IntBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import android.util.Log;
+
 /**
  * A 2D rectangular mesh. Can be drawn textured or untextured.
  * This version is modified from the original Grid.java (found in
@@ -341,7 +343,10 @@ class Grid {
                 gl11.glGenBuffers(1, buffer, 0);
                 mVertBufferIndex = buffer[0];
                 gl11.glBindBuffer(GL11.GL_ARRAY_BUFFER, mVertBufferIndex);
-                final int vertexSize = mVertexBuffer.capacity() * mCoordinateSize; 
+                final int vertexSize = mVertexBuffer.capacity() * mCoordinateSize;
+                // too fast task switching leaves buffers in the middle pos which
+                // crashes app
+                mVertexBuffer.position(0);
                 gl11.glBufferData(GL11.GL_ARRAY_BUFFER, vertexSize, 
                         mVertexBuffer, GL11.GL_STATIC_DRAW);
                 
@@ -352,6 +357,7 @@ class Grid {
                         mTextureCoordBufferIndex);
                 final int texCoordSize = 
                     mTexCoordBuffer.capacity() * mCoordinateSize;
+                mTexCoordBuffer.position(0);
                 gl11.glBufferData(GL11.GL_ARRAY_BUFFER, texCoordSize, 
                         mTexCoordBuffer, GL11.GL_STATIC_DRAW);    
                 
@@ -365,6 +371,8 @@ class Grid {
                         mIndexBufferIndex);
                 // A char is 2 bytes.
                 final int indexSize = mIndexBuffer.capacity() * 2;
+
+                mIndexBuffer.position(0);
                 gl11.glBufferData(GL11.GL_ELEMENT_ARRAY_BUFFER, indexSize, mIndexBuffer, 
                         GL11.GL_STATIC_DRAW);
                 

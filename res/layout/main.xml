@@ -34,7 +34,7 @@
    			android:layout_width="wrap_content" 
    			android:textColor="#FFFFFF" 
    			android:layout_gravity="center_horizontal" 
-   			android:text="Memory #001" android:textSize="20sp" 
+            android:text="@string/level_0_2_lab" android:textSize="20sp"
    			android:textStyle="bold" 
    			android:typeface="sans"/>
    </LinearLayout>

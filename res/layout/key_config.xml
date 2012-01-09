@@ -30,7 +30,7 @@
 			    		<TextView android:layout_height="wrap_content" 
 			    			android:layout_gravity="center" 
 			    			android:layout_width="wrap_content" 
-			    			android:text="A"
+                            android:text="@string/k_A"
 			    			android:id="@+id/key_left"/>
 			   		</LinearLayout>
 			   	</LinearLayout>
@@ -51,7 +51,7 @@
 			    		<TextView android:layout_height="wrap_content" 
 			    				android:layout_gravity="center" 
 			    				android:layout_width="wrap_content" 
-			    				android:text="A"
+                                android:text="@string/k_A"
 			    				android:id="@+id/key_right"/>
 			   		</LinearLayout>
 				</LinearLayout>
@@ -75,7 +75,7 @@
 			    		<TextView android:layout_height="wrap_content" 
 			    				android:layout_gravity="center" 
 			    				android:layout_width="wrap_content" 
-			    				android:text="A"
+                                android:text="@string/k_A"
 			    				android:id="@+id/key_jump"/>
 			   		</LinearLayout>
 			   	</LinearLayout>
@@ -96,7 +96,7 @@
 			    		<TextView android:layout_height="wrap_content" 
 			    				android:layout_gravity="center" 
 			    				android:layout_width="wrap_content" 
-			    				android:text="A"
+                                android:text="@string/k_A"
 			    				android:id="@+id/key_attack"/>
 			   		</LinearLayout>
 			   	</LinearLayout>

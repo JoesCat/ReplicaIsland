@@ -3,7 +3,7 @@
 <levelTree>
 
 <group>
-	<level resource="@raw/level_0_1_sewer" title = "@string/level_0_1_sewer" time = "@string/level_0_1_time" waitmessage="true">
+	<level resource="@raw/level_0_1_sewer_repeat" title = "@string/level_0_1_sewer" time = "@string/level_0_1_time" waitmessage="true">
 		<dialog>
 			<character1 resource ="@xml/level_0_1_dialog_wanda"/>
 		</dialog>

@@ -34,7 +34,7 @@
 				    android:scrollbars="vertical"
 				    android:layout_height="wrap_content"
 				    android:clickable="true"
-				    android:text="Blah blah blah blah blah." 
+				    android:text="@string/cd_blah"
 				    android:paddingLeft="15dp" 
 				    android:paddingRight="15dp" 
 				    android:paddingTop="15dp"/>

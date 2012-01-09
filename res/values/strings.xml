@@ -413,4 +413,14 @@ If I am honest with myself, there is another reason the adventurers had to die. 
 
 <string name="KyleDeadNote">It’s Kyle.  He’s not moving.</string>
 
+<string name="cd_Wanda">Wanda</string>
+<string name="cd_blah">Blah blah blah blah blah</string>
+<string name="s100p">100%</string>
+<string name="zero">0</string>
+<string name="s3_21_34">3:21:34</string>
+<string name="k_A">A</string>
+<string name="level_1_1">Level 1-1</string>
+<string name="s0_02_031">+ 0:02:031</string>
+<string name="min">Min</string>
+<string name="max">Max</string>
 </resources>
