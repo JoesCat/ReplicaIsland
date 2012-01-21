@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# for building replica island only for CTS build
-# Note that there is no Android.mk under the replicaisland folder
-LOCAL_PATH:= external/replicaisland
+LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
@@ -23,13 +21,10 @@ LOCAL_MODULE_TAGS := optional
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_JAVA_LIBRARIES :=
-
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := replicaisland
+LOCAL_PACKAGE_NAME := com.replica.replicaisland
 
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
-
