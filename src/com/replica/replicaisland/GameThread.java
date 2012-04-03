@@ -83,9 +83,9 @@ public class GameThread implements Runnable {
                     if (mProfileTime > PROFILE_REPORT_DELAY * 1000) {
                         final long averageFrameTime = mProfileTime / mProfileFrames;
                         DebugLog.d("Game Profile", "Average: " + averageFrameTime);
+                        mGameRoot.sSystemRegistry.hudSystem.setFPS((int)(1000 * mProfileFrames / mProfileTime));
                         mProfileTime = 0;
                         mProfileFrames = 0;
-                        mGameRoot.sSystemRegistry.hudSystem.setFPS(1000 / (int)averageFrameTime);
                     }
                 }
                 // If the game logic completed in less than 16ms, that means it's running
