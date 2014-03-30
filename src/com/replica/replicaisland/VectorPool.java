@@ -27,7 +27,8 @@ public class VectorPool extends TObjectPool<Vector2> {
     
     @Override
     protected void fill() {
-        for (int x = 0; x < getSize(); x++) {
+        int x, y = getSize();
+        for (x = 0; x < y; x++) {
             getAvailable().add(new Vector2());
         }
     }

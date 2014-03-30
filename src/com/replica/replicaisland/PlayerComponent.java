@@ -38,7 +38,7 @@ public class PlayerComponent extends GameComponent {
     private static final float STOMP_DELAY_TIME = 0.15f;
     private static final float STOMP_AIR_HANG_TIME = 0.0f; //0.25f;
     private static final float STOMP_SHAKE_MAGNITUDE = 15.0f;
-    private static final float STOMP_VIBRATE_TIME = 0.05f;
+    private static final short STOMP_VIBRATE_TIME = 50; /* 50mSec*/
     private static final float HIT_REACT_TIME = 0.5f;
 
     private static final float GHOST_REACTIVATION_DELAY = 0.3f;

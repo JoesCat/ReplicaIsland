@@ -31,12 +31,12 @@ public class VibrationSystem extends BaseObject {
     public void reset() {
     }
     
-    public void vibrate(float seconds) {
+    public void vibrate(short mSecs) {
         ContextParameters params = sSystemRegistry.contextParameters;
         if (params != null && params.context != null) {
             Vibrator vibrator = (Vibrator)params.context.getSystemService(Context.VIBRATOR_SERVICE);
             if (vibrator != null) {
-                vibrator.vibrate((int)(seconds * 1000));
+                vibrator.vibrate((int)(mSecs));
             }
         }
     }
