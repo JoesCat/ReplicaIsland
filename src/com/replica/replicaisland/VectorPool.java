@@ -21,29 +21,28 @@ package com.replica.replicaisland;
  */
 public class VectorPool extends TObjectPool<Vector2> {
 
-    public VectorPool() {
-        super();
-    }
-    
-    @Override
-    protected void fill() {
-        int x, y = getSize();
-        for (x = 0; x < y; x++) {
-            getAvailable().add(new Vector2());
-        }
-    }
+  public VectorPool() {
+    super();
+  }
 
-    @Override
-    public void release(Object entry) {
-        ((Vector2)entry).zero();
-        super.release(entry);
+  @Override
+  protected void fill() {
+    int x, y = getSize();
+    for (x = 0; x < y; x++) {
+      getAvailable().add(new Vector2());
     }
+  }
 
-    /** Allocates a vector and assigns the value of the passed source vector to it. */
-    public Vector2 allocate(Vector2 source) {
-        Vector2 entry = super.allocate();
-        entry.set(source);
-        return entry;
-    }
+  @Override
+  public void release(Object entry) {
+    ((Vector2)entry).zero();
+    super.release(entry);
+  }
 
+  /** Allocates a vector and assigns the value of the passed source vector to it. */
+  public Vector2 allocate(Vector2 source) {
+    Vector2 entry = super.allocate();
+    entry.set(source);
+    return entry;
+  }
 }

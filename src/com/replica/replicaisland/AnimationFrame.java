@@ -17,32 +17,33 @@
 package com.replica.replicaisland;
 
 /**
- * A single animation frame.  Frames contain a texture, a hold time, and collision volumes to
- * use for "attacking" or "vulnerability."  This allows animated sprites to cheaply interact with
- * other objects in the game world by associating collision information with particular animation
- * frames.  Note that an animation frame may have a null texture and null collision volumes.  Null
- * collision volumes will exclude that frame from collision detection and a null texture will
- * prevent the sprite from drawing.
+ * A single animation frame.  Frames contain a texture, a hold time, and
+ * collision volumes to use for "attacking" or "vulnerability."  This allows
+ * animated sprites to cheaply interact with other objects in the game world
+ * by associating collision information with particular animation frames.
+ * Note that an animation frame may have a null texture and null collision
+ * volumes.  Null collision volumes will exclude that frame from collision
+ * detection and a null texture will prevent the sprite from drawing.
  */
 public class AnimationFrame extends AllocationGuard {
-    public Texture texture;
-    public float holdTime;
-    FixedSizeArray<CollisionVolume> attackVolumes;
-    FixedSizeArray<CollisionVolume> vulnerabilityVolumes;
-    
-    public AnimationFrame(Texture textureObject, float animationHoldTime) {
-        super();
-        texture = textureObject;
-        holdTime = animationHoldTime;
-    }
-    
-    public AnimationFrame(Texture textureObject, float animationHoldTime, 
-            FixedSizeArray<CollisionVolume> attackVolumeList,
-            FixedSizeArray<CollisionVolume> vulnerabilityVolumeList) {
-        super();
-        texture = textureObject;
-        holdTime = animationHoldTime;
-        attackVolumes = attackVolumeList;
-        vulnerabilityVolumes = vulnerabilityVolumeList;
-    }
+  public Texture texture;
+  public float holdTime;
+  FixedSizeArray<CollisionVolume> attackVolumes;
+  FixedSizeArray<CollisionVolume> vulnerabilityVolumes;
+
+  public AnimationFrame(Texture textureObject, float animationHoldTime) {
+    super();
+    texture = textureObject;
+    holdTime = animationHoldTime;
+  }
+
+  public AnimationFrame(Texture textureObject, float animationHoldTime,
+	FixedSizeArray<CollisionVolume> attackVolumeList,
+	FixedSizeArray<CollisionVolume> vulnerabilityVolumeList) {
+    super();
+    texture = textureObject;
+    holdTime = animationHoldTime;
+    attackVolumes = attackVolumeList;
+    vulnerabilityVolumes = vulnerabilityVolumeList;
+  }
 }

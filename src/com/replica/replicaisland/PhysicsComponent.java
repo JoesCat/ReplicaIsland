@@ -21,245 +21,237 @@ package com.replica.replicaisland;
  * calculation based on mass, impulses, friction, and collisions.
  */
 public class PhysicsComponent extends GameComponent {
+  private float mMass;
+  private float mBounciness; // 1.0 = super bouncy, 0.0 = zero bounce
+  private float mInertia;
+  private float mStaticFrictionCoeffecient;
+  private float mDynamicFrictionCoeffecient;
 
-    private float mMass;
-    private float mBounciness; // 1.0 = super bouncy, 0.0 = zero bounce
-    private float mInertia;
-    private float mStaticFrictionCoeffecient;
-    private float mDynamicFrictionCoeffecient;
+  private static final float DEFAULT_MASS = 1.0f;
+  private static final float DEFAULT_BOUNCINESS = 0.1f;
+  private static final float DEFAULT_INERTIA = 0.01f;
+  private static final float DEFAULT_STATIC_FRICTION_COEFFECIENT = 0.05f;
+  private static final float DEFAULT_DYNAMIC_FRICTION_COEFFECIENT = 0.02f;
 
-    private static final float DEFAULT_MASS = 1.0f;
-    private static final float DEFAULT_BOUNCINESS = 0.1f;
-    private static final float DEFAULT_INERTIA = 0.01f;
-    private static final float DEFAULT_STATIC_FRICTION_COEFFECIENT = 0.05f;
-    private static final float DEFAULT_DYNAMIC_FRICTION_COEFFECIENT = 0.02f;
-    
-    PhysicsComponent() {
-        super();
-        reset();
-        setPhase(ComponentPhases.POST_PHYSICS.ordinal());
-    }
-    
-    @Override
-    public void reset() {
-        // TODO: no reason to call accessors here locally.
-        setMass(DEFAULT_MASS);
-        setBounciness(DEFAULT_BOUNCINESS);
-        setInertia(DEFAULT_INERTIA);
-        setStaticFrictionCoeffecient(DEFAULT_STATIC_FRICTION_COEFFECIENT);
-        setDynamicFrictionCoeffecient(DEFAULT_DYNAMIC_FRICTION_COEFFECIENT);
-    }
+  PhysicsComponent() {
+    super();
+    reset();
+    setPhase(ComponentPhases.POST_PHYSICS.ordinal());
+  }
 
-    @Override
-    public void update(float timeDelta, BaseObject parent) {
-        GameObject parentObject = (GameObject) parent;
+  @Override
+  public void reset() {
+    // TODO: no reason to call accessors here locally.
+    setMass(DEFAULT_MASS);
+    setBounciness(DEFAULT_BOUNCINESS);
+    setInertia(DEFAULT_INERTIA);
+    setStaticFrictionCoeffecient(DEFAULT_STATIC_FRICTION_COEFFECIENT);
+    setDynamicFrictionCoeffecient(DEFAULT_DYNAMIC_FRICTION_COEFFECIENT);
+  }
 
-        // we look to user data so that other code can provide impulses
-        Vector2 impulseVector = parentObject.getImpulse();
+  @Override
+  public void update(float timeDelta, BaseObject parent) {
+    GameObject parentObject = (GameObject) parent;
 
-        final Vector2 currentVelocity = parentObject.getVelocity();
-        
-        final Vector2 surfaceNormal = parentObject.getBackgroundCollisionNormal();
-        if (surfaceNormal.length2() > 0.0f) {
-            resolveCollision(currentVelocity, impulseVector, surfaceNormal, impulseVector);
-        }
+    // we look to user data so that other code can provide impulses
+    Vector2 impulseVector = parentObject.getImpulse();
 
-        VectorPool vectorPool = sSystemRegistry.vectorPool;
+    final Vector2 currentVelocity = parentObject.getVelocity();
 
-        // if our speed is below inertia, we need to overcome inertia before we can move.
-
-        boolean physicsCausesMovement = true;
-
-        final float inertiaSquared = getInertia() * getInertia();
-
-        Vector2 newVelocity = vectorPool.allocate(currentVelocity);
-        newVelocity.add(impulseVector);
-
-        if (newVelocity.length2() < inertiaSquared) {
-            physicsCausesMovement = false;
-        }
-
-        final boolean touchingFloor = parentObject.touchingGround();
-
-        GravityComponent gravity = parentObject.findByClass(GravityComponent.class);
-
-        if (touchingFloor && currentVelocity.y <= 0.0f && Math.abs(newVelocity.x) > 0.0f
-                        && gravity != null) {
-            final Vector2 gravityVector = gravity.getGravity();
-
-            // if we were moving last frame, we'll use dynamic friction. Else
-            // static.
-            float frictionCoeffecient = Math.abs(currentVelocity.x) > 0.0f ? 
-                        getDynamicFrictionCoeffecient() : getStaticFrictionCoeffecient();
-            frictionCoeffecient *= timeDelta;
-
-            // Friction = cofN, where cof = friction coefficient and N = force
-            // perpendicular to the ground.
-            final float maxFriction = Math.abs(gravityVector.y) * getMass()
-                    * frictionCoeffecient;
-
-            if (maxFriction > Math.abs(newVelocity.x)) {
-                newVelocity.x = (0.0f);
-            } else {
-                newVelocity.x = (newVelocity.x
-                        - (maxFriction * Utils.sign(newVelocity.x)));
-            }
-        }
-
-        if (Math.abs(newVelocity.x) < 0.01f) {
-            newVelocity.x = (0.0f);
-        }
-
-        if (Math.abs(newVelocity.y) < 0.01f) {
-            newVelocity.y = (0.0f);
-        }
-
-        // physics-based movements means constant acceleration, always. set the target to the
-        // velocity.
-        if (physicsCausesMovement) {
-            parentObject.setVelocity(newVelocity);
-            parentObject.setTargetVelocity(newVelocity);
-            parentObject.setAcceleration(Vector2.ZERO);
-            parentObject.setImpulse(Vector2.ZERO);
-        }
-
-        vectorPool.release(newVelocity);
+    final Vector2 surfaceNormal = parentObject.getBackgroundCollisionNormal();
+    if (surfaceNormal.length2() > 0.0f) {
+      resolveCollision(currentVelocity, impulseVector, surfaceNormal, impulseVector);
     }
 
-    protected void resolveCollision(Vector2 velocity, Vector2 impulse, Vector2 opposingNormal,
-                    Vector2 outputImpulse) {
-        VectorPool vectorPool = sSystemRegistry.vectorPool;
+    VectorPool vectorPool = sSystemRegistry.vectorPool;
 
-        outputImpulse.set(impulse);
+    // if our speed is below inertia, we need to overcome inertia before we can move.
 
-        Vector2 collisionNormal = vectorPool.allocate(opposingNormal);
+    boolean physicsCausesMovement = true;
 
-        collisionNormal.normalize();
+    final float inertiaSquared = getInertia() * getInertia();
 
-        Vector2 relativeVelocity = vectorPool.allocate(velocity);
-        relativeVelocity.add(impulse);
+    Vector2 newVelocity = vectorPool.allocate(currentVelocity);
+    newVelocity.add(impulseVector);
 
-        final float dotRelativeAndNormal = relativeVelocity.dot(collisionNormal);
-
-        // make sure the motion of the entity requires resolution
-        if (dotRelativeAndNormal < 0.0f) {
-            final float coefficientOfRestitution = getBounciness(); // 0 = perfectly inelastic,
-                                                                    // 1 = perfectly elastic
-
-            // calculate an impulse to apply to the entity
-            float j = (-(1 + coefficientOfRestitution) * dotRelativeAndNormal);
-
-            j /= ((collisionNormal.dot(collisionNormal)) * (1 / getMass()));
-
-            Vector2 entity1Adjust = vectorPool.allocate(collisionNormal);
-
-            entity1Adjust.set(collisionNormal);
-            entity1Adjust.multiply(j);
-            entity1Adjust.divide(getMass());
-            entity1Adjust.add(impulse);
-            outputImpulse.set(entity1Adjust);
-            vectorPool.release(entity1Adjust);
-
-        }
-
-        vectorPool.release(collisionNormal);
-        vectorPool.release(relativeVelocity);
+    if (newVelocity.length2() < inertiaSquared) {
+      physicsCausesMovement = false;
     }
 
-    protected void resolveCollision(Vector2 velocity, Vector2 impulse, Vector2 opposingNormal,
-                    float otherMass, Vector2 otherVelocity, Vector2 otherImpulse,
-                    float otherBounciness, Vector2 outputImpulse) {
-        VectorPool vectorPool = sSystemRegistry.vectorPool;
+    final boolean touchingFloor = parentObject.touchingGround();
 
-        Vector2 collisionNormal = vectorPool.allocate(opposingNormal);
-        collisionNormal.normalize();
+    GravityComponent gravity = parentObject.findByClass(GravityComponent.class);
 
-        Vector2 entity1Velocity = vectorPool.allocate(velocity);
-        entity1Velocity.add(impulse);
+    if (touchingFloor && currentVelocity.y <= 0.0f && Math.abs(newVelocity.x) > 0.0f
+	&& gravity != null) {
+      final Vector2 gravityVector = gravity.getGravity();
 
-        Vector2 entity2Velocity = vectorPool.allocate(otherVelocity);
-        entity2Velocity.add(otherImpulse);
+      // if we're moving last frame, we'll use dynamic friction. Else static.
+      float frictionCoeffecient = Math.abs(currentVelocity.x) > 0.0f ?
+		getDynamicFrictionCoeffecient() : getStaticFrictionCoeffecient();
+      frictionCoeffecient *= timeDelta;
 
-        Vector2 relativeVelocity = vectorPool.allocate(entity1Velocity);
-        relativeVelocity.subtract(entity2Velocity);
+      // Friction = cofN, where cof = friction coefficient and N = force
+      // perpendicular to the ground.
+      final float maxFriction = Math.abs(gravityVector.y) * getMass()
+				* frictionCoeffecient;
 
-        final float dotRelativeAndNormal = relativeVelocity.dot(collisionNormal);
-
-        // make sure the entities' motion requires resolution
-        if (dotRelativeAndNormal < 0.0f) {
-            final float bounciness = Math.min(getBounciness() + otherBounciness, 1.0f);
-            final float coefficientOfRestitution = bounciness;  // 0 = perfectly inelastic,
-                                                                // 1 = perfectly elastic
-            
-            // calculate an impulse to apply to both entities
-            float j = (-(1 + coefficientOfRestitution) * dotRelativeAndNormal);
-
-            j /= ((collisionNormal.dot(collisionNormal)) * (1 / getMass() + 1 / otherMass));
-
-            Vector2 entity1Adjust = vectorPool.allocate(collisionNormal);
-            entity1Adjust.multiply(j);
-            entity1Adjust.divide(getMass());
-            entity1Adjust.add(impulse);
-
-            outputImpulse.set(entity1Adjust);
-
-            // TODO: Deal impulses both ways.
-            /*
-             * Vector3 entity2Adjust = (collisionNormal j); 
-             * entity2Adjust[0] /= otherMass;
-             * entity2Adjust[1] /= otherMass; 
-             * entity2Adjust[2] /= otherMass;
-             * 
-             * const Vector3 newEntity2Impulse = otherImpulse + entity2Adjust;
-             */
-
-            vectorPool.release(entity1Adjust);
-        }
-
-        vectorPool.release(collisionNormal);
-        vectorPool.release(entity1Velocity);
-        vectorPool.release(entity2Velocity);
-        vectorPool.release(relativeVelocity);
+      if (maxFriction > Math.abs(newVelocity.x)) {
+	newVelocity.x = (0.0f);
+      } else {
+	newVelocity.x = (newVelocity.x - (maxFriction * Utils.sign(newVelocity.x)));
+      }
     }
 
-    public float getMass() {
-        return mMass;
+    if (Math.abs(newVelocity.x) < 0.01f) {
+      newVelocity.x = (0.0f);
     }
 
-    public void setMass(float mass) {
-        mMass = mass;
+    if (Math.abs(newVelocity.y) < 0.01f) {
+      newVelocity.y = (0.0f);
     }
 
-    public float getBounciness() {
-        return mBounciness;
+    // physics-based movements means constant acceleration, always.
+    // set the target to the velocity.
+    if (physicsCausesMovement) {
+      parentObject.setVelocity(newVelocity);
+      parentObject.setTargetVelocity(newVelocity);
+      parentObject.setAcceleration(Vector2.ZERO);
+      parentObject.setImpulse(Vector2.ZERO);
     }
+    vectorPool.release(newVelocity);
+  }
 
-    public void setBounciness(float bounciness) {
-        mBounciness = bounciness;
+  protected void resolveCollision(Vector2 velocity, Vector2 impulse, Vector2 opposingNormal,
+				  Vector2 outputImpulse) {
+    VectorPool vectorPool = sSystemRegistry.vectorPool;
+
+    outputImpulse.set(impulse);
+
+    Vector2 collisionNormal = vectorPool.allocate(opposingNormal);
+
+    collisionNormal.normalize();
+
+    Vector2 relativeVelocity = vectorPool.allocate(velocity);
+    relativeVelocity.add(impulse);
+
+    final float dotRelativeAndNormal = relativeVelocity.dot(collisionNormal);
+
+    // make sure the motion of the entity requires resolution
+    if (dotRelativeAndNormal < 0.0f) {
+      final float coefficientOfRestitution = getBounciness(); // 0 = perfectly inelastic,
+							      // 1 = perfectly elastic
+
+      // calculate an impulse to apply to the entity
+      float j = (-(1 + coefficientOfRestitution) * dotRelativeAndNormal);
+
+      j /= ((collisionNormal.dot(collisionNormal)) * (1 / getMass()));
+
+      Vector2 entity1Adjust = vectorPool.allocate(collisionNormal);
+
+      entity1Adjust.set(collisionNormal);
+      entity1Adjust.multiply(j);
+      entity1Adjust.divide(getMass());
+      entity1Adjust.add(impulse);
+      outputImpulse.set(entity1Adjust);
+      vectorPool.release(entity1Adjust);
     }
+    vectorPool.release(collisionNormal);
+    vectorPool.release(relativeVelocity);
+  }
 
-    public float getInertia() {
-        return mInertia;
+  protected void resolveCollision(Vector2 velocity, Vector2 impulse, Vector2 opposingNormal,
+				  float otherMass, Vector2 otherVelocity, Vector2 otherImpulse,
+				  float otherBounciness, Vector2 outputImpulse) {
+    VectorPool vectorPool = sSystemRegistry.vectorPool;
+
+    Vector2 collisionNormal = vectorPool.allocate(opposingNormal);
+    collisionNormal.normalize();
+
+    Vector2 entity1Velocity = vectorPool.allocate(velocity);
+    entity1Velocity.add(impulse);
+
+    Vector2 entity2Velocity = vectorPool.allocate(otherVelocity);
+    entity2Velocity.add(otherImpulse);
+
+    Vector2 relativeVelocity = vectorPool.allocate(entity1Velocity);
+    relativeVelocity.subtract(entity2Velocity);
+
+    final float dotRelativeAndNormal = relativeVelocity.dot(collisionNormal);
+
+    // make sure the entities' motion requires resolution
+    if (dotRelativeAndNormal < 0.0f) {
+      final float bounciness = Math.min(getBounciness() + otherBounciness, 1.0f);
+      final float coefficientOfRestitution = bounciness;  // 0 = perfectly inelastic,
+							  // 1 = perfectly elastic
+
+      // calculate an impulse to apply to both entities
+      float j = (-(1 + coefficientOfRestitution) * dotRelativeAndNormal);
+
+      j /= ((collisionNormal.dot(collisionNormal)) * (1 / getMass() + 1 / otherMass));
+
+      Vector2 entity1Adjust = vectorPool.allocate(collisionNormal);
+      entity1Adjust.multiply(j);
+      entity1Adjust.divide(getMass());
+      entity1Adjust.add(impulse);
+
+      outputImpulse.set(entity1Adjust);
+
+      // TODO: Deal impulses both ways.
+      /*
+       * Vector3 entity2Adjust = (collisionNormal j);
+       * entity2Adjust[0] /= otherMass;
+       * entity2Adjust[1] /= otherMass;
+       * entity2Adjust[2] /= otherMass;
+       *
+       * const Vector3 newEntity2Impulse = otherImpulse + entity2Adjust;
+       */
+
+      vectorPool.release(entity1Adjust);
     }
+    vectorPool.release(collisionNormal);
+    vectorPool.release(entity1Velocity);
+    vectorPool.release(entity2Velocity);
+    vectorPool.release(relativeVelocity);
+  }
 
-    public void setInertia(float inertia) {
-        mInertia = inertia;
-    }
+  public float getMass() {
+    return mMass;
+  }
 
-    public float getStaticFrictionCoeffecient() {
-        return mStaticFrictionCoeffecient;
-    }
+  public void setMass(float mass) {
+    mMass = mass;
+  }
 
-    public void setStaticFrictionCoeffecient(float staticFrictionCoeffecient) {
-        mStaticFrictionCoeffecient = staticFrictionCoeffecient;
-    }
+  public float getBounciness() {
+    return mBounciness;
+  }
 
-    public float getDynamicFrictionCoeffecient() {
-        return mDynamicFrictionCoeffecient;
-    }
+  public void setBounciness(float bounciness) {
+    mBounciness = bounciness;
+  }
 
-    public void setDynamicFrictionCoeffecient(float dynamicFrictionCoeffecient) {
-        mDynamicFrictionCoeffecient = dynamicFrictionCoeffecient;
-    }
+  public float getInertia() {
+    return mInertia;
+  }
 
+  public void setInertia(float inertia) {
+    mInertia = inertia;
+  }
+
+  public float getStaticFrictionCoeffecient() {
+    return mStaticFrictionCoeffecient;
+  }
+
+  public void setStaticFrictionCoeffecient(float staticFrictionCoeffecient) {
+    mStaticFrictionCoeffecient = staticFrictionCoeffecient;
+  }
+
+  public float getDynamicFrictionCoeffecient() {
+    return mDynamicFrictionCoeffecient;
+  }
+
+  public void setDynamicFrictionCoeffecient(float dynamicFrictionCoeffecient) {
+    mDynamicFrictionCoeffecient = dynamicFrictionCoeffecient;
+  }
 }

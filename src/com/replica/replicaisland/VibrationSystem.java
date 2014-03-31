@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.replica.replicaisland;
 
 import android.os.Vibrator;
 import android.content.Context;
 
-/** A system for accessing the Android vibrator.  Note that this system requires the app's 
- * AndroidManifest.xml to contain permissions for the Vibrator service.
+/** A system for accessing the Android vibrator.  Note that this system
+ * requires the app's AndroidManifest.xml to contain permissions for the
+ * Vibrator service.
  */
 public class VibrationSystem extends BaseObject {
 
-    public VibrationSystem() {
-        super();
+  public VibrationSystem() {
+    super();
+  }
+
+  @Override
+  public void reset() {
+  }
+
+  public void vibrate(short mSecs) {
+    ContextParameters params = sSystemRegistry.contextParameters;
+    if (params != null && params.context != null) {
+      Vibrator vibrator = (Vibrator)params.context.getSystemService(Context.VIBRATOR_SERVICE);
+      if (vibrator != null) {
+	vibrator.vibrate((int)(mSecs));
+      }
     }
-    
-    @Override
-    public void reset() {
-    }
-    
-    public void vibrate(short mSecs) {
-        ContextParameters params = sSystemRegistry.contextParameters;
-        if (params != null && params.context != null) {
-            Vibrator vibrator = (Vibrator)params.context.getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibrator != null) {
-                vibrator.vibrate((int)(mSecs));
-            }
-        }
-    }
+  }
 }

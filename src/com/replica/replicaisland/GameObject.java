@@ -19,229 +19,231 @@ package com.replica.replicaisland;
 import com.replica.replicaisland.CollisionParameters.HitType;
 
 /**
- * GameObject defines any object that resides in the game world (character, background, special
- * effect, enemy, etc).  It is a collection of GameComponents which implement its behavior;
- * GameObjects themselves have no intrinsic behavior.  GameObjects are also "bags of data" that
- * components can use to share state (direct component-to-component communication is discouraged).
+ * GameObject defines any object that resides in the game world (character,
+ * background, special effect, enemy, etc).  It is a collection of
+ * GameComponents which implement its behavior; GameObjects themselves have
+ * no intrinsic behavior.  GameObjects are also "bags of data" that components
+ * can use to share state (direct component-to-component communication is
+ * discouraged).
  */
 public class GameObject extends PhasedObjectManager {
-    private final static float COLLISION_SURFACE_DECAY_TIME = 0.3f;
-    // These fields are managed by components.
-    private Vector2 mPosition;
-    private Vector2 mVelocity;
-    private Vector2 mTargetVelocity;
-    private Vector2 mAcceleration;
-    private Vector2 mImpulse;
+  private final static float COLLISION_SURFACE_DECAY_TIME = 0.3f;
+  // These fields are managed by components.
+  private Vector2 mPosition;
+  private Vector2 mVelocity;
+  private Vector2 mTargetVelocity;
+  private Vector2 mAcceleration;
+  private Vector2 mImpulse;
 
-    private Vector2 mBackgroundCollisionNormal;
+  private Vector2 mBackgroundCollisionNormal;
 
-    private float mLastTouchedFloorTime;
-    private float mLastTouchedCeilingTime;
-    private float mLastTouchedLeftWallTime;
-    private float mLastTouchedRightWallTime;
-  
-    public boolean positionLocked;
-    
-    public float activationRadius;
-    public boolean destroyOnDeactivation;
-    
-    public int life;
-    
-    public int lastReceivedHitType;
-    
-    public Vector2 facingDirection;
-    public float width;
-    public float height;
-    
-    private static final int DEFAULT_LIFE = 1;
-    
-    public enum ActionType {
-        INVALID,
-        IDLE,
-        MOVE,
-        ATTACK,
-        HIT_REACT,
-        DEATH,
-        HIDE,
-        FROZEN
-    }
-    
-    private ActionType mCurrentAction;
-    
-    public enum Team {
-        NONE,
-        PLAYER,
-        ENEMY
-    }
-    
-    public Team team;
-    
-    public GameObject() {
-        super();
+  private float mLastTouchedFloorTime;
+  private float mLastTouchedCeilingTime;
+  private float mLastTouchedLeftWallTime;
+  private float mLastTouchedRightWallTime;
 
-        mPosition = new Vector2();
-        mVelocity = new Vector2();
-        mTargetVelocity = new Vector2();
-        mAcceleration = new Vector2();
-        mImpulse = new Vector2();
-        mBackgroundCollisionNormal = new Vector2();
-        
-        facingDirection = new Vector2(1, 0);
-        
-        reset();
-    }
-    
-    @Override
-    public void reset() {
-        removeAll();
-        commitUpdates();
-        
-        mPosition.zero();
-        mVelocity.zero();
-        mTargetVelocity.zero();
-        mAcceleration.zero();
-        mImpulse.zero();
-        mBackgroundCollisionNormal.zero();
-        facingDirection.set(1.0f, 1.0f);
-        
-        mCurrentAction = ActionType.INVALID;
-        positionLocked = false;
-        activationRadius = 0;
-        destroyOnDeactivation = false;
-        life = DEFAULT_LIFE;
-        team = Team.NONE;
-        width = 0.0f;
-        height = 0.0f;
-        
-        lastReceivedHitType = HitType.INVALID;
-    }
-    
-    // Utility functions
-    public final boolean touchingGround() {
-        final TimeSystem time = sSystemRegistry.timeSystem;
-        final float gameTime = time.getGameTime();
-        final boolean touching = gameTime > 0.1f &&
-            Utils.close(mLastTouchedFloorTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
-        return touching;
-    }
-    
-    public final boolean touchingCeiling() {
-        final TimeSystem time = sSystemRegistry.timeSystem;
-        final float gameTime = time.getGameTime();
-        final boolean touching = gameTime > 0.1f && 
-            Utils.close(mLastTouchedCeilingTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
-        return touching;
-    }
-    
-    public final boolean touchingLeftWall() {
-        final TimeSystem time = sSystemRegistry.timeSystem;
-        final float gameTime = time.getGameTime();
-        final boolean touching = gameTime > 0.1f &&
-            Utils.close(mLastTouchedLeftWallTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
-        return touching;
-    }
-    
-    public final boolean touchingRightWall() {
-        final TimeSystem time = sSystemRegistry.timeSystem;
-        final float gameTime = time.getGameTime();
-        final boolean touching = gameTime > 0.1f &&
-            Utils.close(mLastTouchedRightWallTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
-        return touching;
-    }
+  public boolean positionLocked;
 
-    public final Vector2 getPosition() {
-        return mPosition;
-    }
+  public float activationRadius;
+  public boolean destroyOnDeactivation;
 
-    public final void setPosition(Vector2 position) {
-        mPosition.set(position);
-    }
-    
-    public final float getCenteredPositionX() {
-        return mPosition.x + (width / 2.0f);
-    }
-    
-    public final float getCenteredPositionY() {
-        return mPosition.y + (height / 2.0f);
-    }
+  public int life;
 
-    public final Vector2 getVelocity() {
-        return mVelocity;
-    }
+  public int lastReceivedHitType;
 
-    public final void setVelocity(Vector2 velocity) {
-        mVelocity.set(velocity);
-    }
+  public Vector2 facingDirection;
+  public float width;
+  public float height;
 
-    public final Vector2 getTargetVelocity() {
-        return mTargetVelocity;
-    }
+  private static final int DEFAULT_LIFE = 1;
 
-    public final void setTargetVelocity(Vector2 targetVelocity) {
-        mTargetVelocity.set(targetVelocity);
-    }
+  public enum ActionType {
+	INVALID,
+	IDLE,
+	MOVE,
+	ATTACK,
+	HIT_REACT,
+	DEATH,
+	HIDE,
+	FROZEN
+  }
 
-    public final Vector2 getAcceleration() {
-        return mAcceleration;
-    }
+  private ActionType mCurrentAction;
 
-    public final void setAcceleration(Vector2 acceleration) {
-        mAcceleration.set(acceleration);
-    }
+  public enum Team {
+	NONE,
+	PLAYER,
+	ENEMY
+  }
 
-    public final Vector2 getImpulse() {
-        return mImpulse;
-    }
+  public Team team;
 
-    public final void setImpulse(Vector2 impulse) {
-        mImpulse.set(impulse);
-    }
+  public GameObject() {
+    super();
 
-    public final Vector2 getBackgroundCollisionNormal() {
-        return mBackgroundCollisionNormal;
-    }
+    mPosition = new Vector2();
+    mVelocity = new Vector2();
+    mTargetVelocity = new Vector2();
+    mAcceleration = new Vector2();
+    mImpulse = new Vector2();
+    mBackgroundCollisionNormal = new Vector2();
 
-    public final void setBackgroundCollisionNormal(Vector2 normal) {
-        mBackgroundCollisionNormal.set(normal);
-    }
+    facingDirection = new Vector2(1, 0);
 
-    public final float getLastTouchedFloorTime() {
-        return mLastTouchedFloorTime;
-    }
+    reset();
+  }
 
-    public final void setLastTouchedFloorTime(float lastTouchedFloorTime) {
-        mLastTouchedFloorTime = lastTouchedFloorTime;
-    }
+  @Override
+  public void reset() {
+    removeAll();
+    commitUpdates();
 
-    public final float getLastTouchedCeilingTime() {
-        return mLastTouchedCeilingTime;
-    }
+    mPosition.zero();
+    mVelocity.zero();
+    mTargetVelocity.zero();
+    mAcceleration.zero();
+    mImpulse.zero();
+    mBackgroundCollisionNormal.zero();
+    facingDirection.set(1.0f, 1.0f);
 
-    public final void setLastTouchedCeilingTime(float lastTouchedCeilingTime) {
-        mLastTouchedCeilingTime = lastTouchedCeilingTime;
-    }
+    mCurrentAction = ActionType.INVALID;
+    positionLocked = false;
+    activationRadius = 0;
+    destroyOnDeactivation = false;
+    life = DEFAULT_LIFE;
+    team = Team.NONE;
+    width = 0.0f;
+    height = 0.0f;
 
-    public final float getLastTouchedLeftWallTime() {
-        return mLastTouchedLeftWallTime;
-    }
+    lastReceivedHitType = HitType.INVALID;
+  }
 
-    public final void setLastTouchedLeftWallTime(float lastTouchedLeftWallTime) {
-        mLastTouchedLeftWallTime = lastTouchedLeftWallTime;
-    }
+  // Utility functions
+  public final boolean touchingGround() {
+    final TimeSystem time = sSystemRegistry.timeSystem;
+    final float gameTime = time.getGameTime();
+    final boolean touching = gameTime > 0.1f &&
+	Utils.close(mLastTouchedFloorTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
+    return touching;
+  }
 
-    public final float getLastTouchedRightWallTime() {
-        return mLastTouchedRightWallTime;
-    }
+  public final boolean touchingCeiling() {
+    final TimeSystem time = sSystemRegistry.timeSystem;
+    final float gameTime = time.getGameTime();
+    final boolean touching = gameTime > 0.1f &&
+	Utils.close(mLastTouchedCeilingTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
+    return touching;
+  }
 
-    public final void setLastTouchedRightWallTime(float lastTouchedRightWallTime) {
-        mLastTouchedRightWallTime = lastTouchedRightWallTime;
-    }
-    
-    public final ActionType getCurrentAction() {
-        return mCurrentAction;
-    }
-    
-    public final void setCurrentAction(ActionType type) {
-        mCurrentAction = type;
-    }
+  public final boolean touchingLeftWall() {
+    final TimeSystem time = sSystemRegistry.timeSystem;
+    final float gameTime = time.getGameTime();
+    final boolean touching = gameTime > 0.1f &&
+	Utils.close(mLastTouchedLeftWallTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
+    return touching;
+  }
+
+  public final boolean touchingRightWall() {
+    final TimeSystem time = sSystemRegistry.timeSystem;
+    final float gameTime = time.getGameTime();
+    final boolean touching = gameTime > 0.1f &&
+	Utils.close(mLastTouchedRightWallTime, time.getGameTime(), COLLISION_SURFACE_DECAY_TIME);
+    return touching;
+  }
+
+  public final Vector2 getPosition() {
+    return mPosition;
+  }
+
+  public final void setPosition(Vector2 position) {
+    mPosition.set(position);
+  }
+
+  public final float getCenteredPositionX() {
+    return mPosition.x + (width / 2.0f);
+  }
+
+  public final float getCenteredPositionY() {
+    return mPosition.y + (height / 2.0f);
+  }
+
+  public final Vector2 getVelocity() {
+    return mVelocity;
+  }
+
+  public final void setVelocity(Vector2 velocity) {
+    mVelocity.set(velocity);
+  }
+
+  public final Vector2 getTargetVelocity() {
+    return mTargetVelocity;
+  }
+
+  public final void setTargetVelocity(Vector2 targetVelocity) {
+    mTargetVelocity.set(targetVelocity);
+  }
+
+  public final Vector2 getAcceleration() {
+    return mAcceleration;
+  }
+
+  public final void setAcceleration(Vector2 acceleration) {
+    mAcceleration.set(acceleration);
+  }
+
+  public final Vector2 getImpulse() {
+    return mImpulse;
+  }
+
+  public final void setImpulse(Vector2 impulse) {
+    mImpulse.set(impulse);
+  }
+
+  public final Vector2 getBackgroundCollisionNormal() {
+    return mBackgroundCollisionNormal;
+  }
+
+  public final void setBackgroundCollisionNormal(Vector2 normal) {
+    mBackgroundCollisionNormal.set(normal);
+  }
+
+  public final float getLastTouchedFloorTime() {
+    return mLastTouchedFloorTime;
+  }
+
+  public final void setLastTouchedFloorTime(float lastTouchedFloorTime) {
+    mLastTouchedFloorTime = lastTouchedFloorTime;
+  }
+
+  public final float getLastTouchedCeilingTime() {
+    return mLastTouchedCeilingTime;
+  }
+
+  public final void setLastTouchedCeilingTime(float lastTouchedCeilingTime) {
+    mLastTouchedCeilingTime = lastTouchedCeilingTime;
+  }
+
+  public final float getLastTouchedLeftWallTime() {
+    return mLastTouchedLeftWallTime;
+  }
+
+  public final void setLastTouchedLeftWallTime(float lastTouchedLeftWallTime) {
+    mLastTouchedLeftWallTime = lastTouchedLeftWallTime;
+  }
+
+  public final float getLastTouchedRightWallTime() {
+    return mLastTouchedRightWallTime;
+  }
+
+  public final void setLastTouchedRightWallTime(float lastTouchedRightWallTime) {
+    mLastTouchedRightWallTime = lastTouchedRightWallTime;
+  }
+
+  public final ActionType getCurrentAction() {
+    return mCurrentAction;
+  }
+
+  public final void setCurrentAction(ActionType type) {
+    mCurrentAction = type;
+  }
 }

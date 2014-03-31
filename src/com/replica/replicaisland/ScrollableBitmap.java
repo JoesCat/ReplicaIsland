@@ -17,40 +17,40 @@
 package com.replica.replicaisland;
 
 /**
- * Implements a bitmap that can be scrolled in place, such as the background of a scrolling
- * world.
+ * Implements a bitmap that can be scrolled in place, such as the background
+ * of a scrolling world.
  */
 public class ScrollableBitmap extends DrawableBitmap {
-    private float mScrollOriginX;
-    private float mScrollOriginY;
-    
-    public ScrollableBitmap(Texture texture, int width, int height) {
-        super(texture, width, height);
-    }
+  private float mScrollOriginX;
+  private float mScrollOriginY;
 
-    public void setScrollOrigin(float x, float y) {
-        mScrollOriginX = x;
-        mScrollOriginY = y;
-    }
+  public ScrollableBitmap(Texture texture, int width, int height) {
+    super(texture, width, height);
+  }
 
-    @Override
-    public void draw(float x, float y, float scaleX, float scaleY) {
-        super.draw(x - mScrollOriginX, y - mScrollOriginY, scaleX, scaleY);
-    }
+  public void setScrollOrigin(float x, float y) {
+    mScrollOriginX = x;
+    mScrollOriginY = y;
+  }
 
-    public float getScrollOriginX() {
-        return mScrollOriginX;
-    }
+  @Override
+  public void draw(float x, float y, float scaleX, float scaleY) {
+    super.draw(x - mScrollOriginX, y - mScrollOriginY, scaleX, scaleY);
+  }
 
-    public void setScrollOriginX(float scrollOriginX) {
-        mScrollOriginX = scrollOriginX;
-    }
+  public float getScrollOriginX() {
+    return mScrollOriginX;
+  }
 
-    public float getScrollOriginY() {
-        return mScrollOriginY;
-    }
+  public void setScrollOriginX(float scrollOriginX) {
+    mScrollOriginX = scrollOriginX;
+  }
 
-    public void setScrollOriginY(float scrollOriginY) {
-        mScrollOriginY = scrollOriginY;
-    }
+  public float getScrollOriginY() {
+    return mScrollOriginY;
+  }
+
+  public void setScrollOriginY(float scrollOriginY) {
+    mScrollOriginY = scrollOriginY;
+  }
 }
